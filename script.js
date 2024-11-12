@@ -1,4 +1,11 @@
 let records = [];
+let items = localStorage.getItem("items");
+if (!items) {
+  items = [];
+} else {
+  items = JSON.parse(items);
+}
+
 document.querySelector("form").addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -28,6 +35,19 @@ document.querySelector("form").addEventListener("submit", (e) => {
     quantity,
   };
 
+  //Search if item alreaddy exists
+  let found = records.find((r) => {
+    return (r.item = item);
+  });
+
+  if (found) {
+    if (found.price == price) {
+      found.quantity = parseFloat(found.quantity) + parseFloat(quantity);
+      displayRecords();
+      return false;
+    }
+  }
+
   // Push to array
   records.push(record); //For add data end of array
 
@@ -35,6 +55,22 @@ document.querySelector("form").addEventListener("submit", (e) => {
   // records.unshift(record); //For add data begin of the array
 
   displayRecords();
+
+  let foundItem = items.find((record) => {
+    return record.item.toLowerCase() == item.toLowerCase();
+  });
+
+  if (!foundItem) {
+    items.push({ item, price });
+    localStorage.setItem("items", JSON.stringify(items));
+  } else if (parseFloat(foundItem.price) != parseFloat(price)) {
+    items.forEach((record) => {
+      if (record.item.toLowerCase() == item.toLowerCase()) {
+        record.price = price;
+        localStorage.setItem("items", JSON.stringify(items));
+      }
+    });
+  }
 });
 
 function displayRecords() {
@@ -143,3 +179,65 @@ document.getElementById("clearBtn").onclick = () => {
     displayRecords();
   }
 };
+
+// <----------------------------------------------------------------->
+
+const input = document.getElementById("item");
+const suggestions = document.getElementById("suggestions");
+input.addEventListener("keyup", function (event) {
+  let val = input.value;
+  if (val.trim() == "") {
+    suggestions.innerHTML = "";
+    return;
+  }
+
+  if (event.key == "ArrowDown" || event.key == "ArrowUp") {
+    let selected = document.querySelector("#suggestions li.selected");
+
+    if (selected) {
+      if (event.key == "ArrowDown") {
+        if (selected.nextElementSibling) {
+          selected.nextElementSibling.classList.add("selected");
+          selected.classList.remove("selected");
+        }
+      } else {
+        if (selected.previousElementSibling) {
+          selected.previousElementSibling.classList.add("selected");
+          selected.classList.remove("selected");
+        }
+      }
+    } else {
+      if (event.key == "ArrowDown") {
+        document.querySelector("#suggestions li").classList.add("selected");
+      }
+    }
+    return;
+  }
+
+  let res = items.filter(function (record) {
+    return record.item.toLowerCase().includes(val.toLowerCase());
+  });
+
+  suggestions.innerHTML = "";
+  res.forEach(function (suggestion) {
+    let li = document.createElement("li");
+    li.textContent = suggestion.item;
+    li.onclick = function () {
+      input.value = suggestion.item;
+      document.getElementById("price").value = suggestion.price;
+      document.getElementById("price").focus();
+      suggestions.innerHTML = "";
+    };
+    suggestions.appendChild(li);
+  });
+});
+
+input.addEventListener("keydown", function (event) {
+  if (event.key == "Enter") {
+    let selected = document.querySelector("#suggestions li.selected");
+    if (selected) {
+      selected.click();
+      event.preventDefault();
+    }
+  }
+});

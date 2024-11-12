@@ -54,14 +54,46 @@
             color: white;
             border-radius: 50%;
         }
+
+        /* Suggestions */
+        #suggestions{
+            position: absolute;
+            width: 290px;
+            top: 25px;
+            left: 105px;
+            background-color: azure;
+            z-index: 1;
+            padding: 0px;
+        }
+
+        #suggestions li{
+            list-style: none;
+            padding: 5px;
+            border-bottom: 1px solid blue;
+        }
+
+        #suggestions li:hover{
+            background-color: aqua;
+        }
+
+        #suggestions li.selected{
+            background-color: aqua;
+        }
         
     </style>
 </head>
 <body>
     <h1>Billing System</h1>
     <form action="index.php" method="post">
-        <label for="item">Item</label>
-        <input type="text" name="item" id="item">
+        <div style="position: relative;">
+            <label for="item">Item</label>
+            <input type="text" name="item" id="item">
+            <ul id="suggestions">
+                <!-- <li>A</li>
+                <li>B</li>
+                <li>C</li> -->
+            </ul>
+        </div>
         <br>
         <label for="price">Price</label>
         <input type="number" name="price" id="price">
